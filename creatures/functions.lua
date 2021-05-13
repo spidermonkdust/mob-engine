@@ -31,11 +31,11 @@ local function knockback(selfOrObject, dir, old_dir, strengh)
   end
   local current_fmd = object:get_properties().automatic_face_movement_dir or 0
   object:set_properties({automatic_face_movement_dir = false})
-  object:setvelocity(vector.add(old_dir, {x = dir.x * strengh, y = 3.5, z = dir.z * strengh}))
+  object:set_velocity(vector.add(old_dir, {x = dir.x * strengh, y = 3.5, z = dir.z * strengh}))
   old_dir.y = 0
   core.after(0.4, function()
     object:set_properties({automatic_face_movement_dir = current_fmd})
-    object:setvelocity(old_dir)
+    object:set_velocity(old_dir)
     selfOrObject.falltimer = nil
     if selfOrObject.stunned == true then
       selfOrObject.stunned = false
@@ -86,7 +86,7 @@ local function update_animation(obj_ref, mode, anim_def)
 end
 
 local function update_velocity(obj_ref, dir, speed, add)
-  local velo = obj_ref:getvelocity()
+  local velo = obj_ref:get_velocity()
   if not dir.y then
     dir.y = velo.y/speed
   end
@@ -94,7 +94,7 @@ local function update_velocity(obj_ref, dir, speed, add)
   if add then
     new_velo = vector.add(velo, new_velo)
   end
-  obj_ref:setvelocity(new_velo)
+  obj_ref:set_velocity(new_velo)
 end
 
 local function getYaw(dirOrYaw)
@@ -119,8 +119,8 @@ local function killMob(me, def)
       me:remove()
     end
   end
-  local pos = me:getpos()
-  me:setvelocity(nullVec)
+  local pos = me:get_pos()
+  me:set_velocity(nullVec)
   me:set_properties({collisionbox = nullVec})
   me:set_hp(0)
 
@@ -181,7 +181,7 @@ local function onDamage(self, hp)
     on_hit(me) -- red flashing
     if def.sounds and def.sounds.on_damage then
       local dmg_snd = def.sounds.on_damage
-      core.sound_play(dmg_snd.name, {pos = me:getpos(), max_hear_distance = dmg_snd.distance or 5, gain = dmg_snd.gain or 1})
+      core.sound_play(dmg_snd.name, {pos = me:get_pos(), max_hear_distance = dmg_snd.distance or 5, gain = dmg_snd.gain or 1})
     end
   end
 end
@@ -256,7 +256,7 @@ creatures.on_punch = function(self, puncher, time_from_last_punch, tool_capabili
   end
 
   local me = self.object
-  local mypos = me:getpos()
+  local mypos = me:get_pos()
 
   changeHP(self, calcPunchDamage(me, time_from_last_punch, tool_capabilities) * -1)
   if puncher then
@@ -266,10 +266,10 @@ creatures.on_punch = function(self, puncher, time_from_last_punch, tool_capabili
     end
     if time_from_last_punch >= 0.45 and self.stunned == false then
       if self.has_kockback == true then
-        local v = me:getvelocity()
+        local v = me:get_velocity()
         v.y = 0
         if not self.can_fly then
-          me:setacceleration({x = 0, y = -15, z = 0})
+          me:set_acceleration({x = 0, y = -15, z = 0})
         end
         knockback(self, dir, v, 5)
         self.stunned = true
@@ -332,7 +332,7 @@ creatures.on_step = function(self, dtime)
   local modes = def.modes
   local current_mode = self.mode
   local me = self.object
-  local current_pos = me:getpos()
+  local current_pos = me:get_pos()
   current_pos.y = current_pos.y + 0.5
   local moved = hasMoved(current_pos, self.last_pos) or false
   local fallen = false
@@ -397,7 +397,7 @@ creatures.on_step = function(self, dtime)
   -- check distance to target
   if self.target and self.followtimer > 0.6 then
     self.followtimer = 0
-    local p2 = self.target:getpos()
+    local p2 = self.target:get_pos()
     local dir = getDir(current_pos, p2)
     local offset
     if self.can_fly then
@@ -428,9 +428,9 @@ creatures.on_step = function(self, dtime)
     else
       if current_mode == "attack" or current_mode == "follow" then
         self.dir = vector.normalize(dir)
-        me:setyaw(getYaw(dir))
+        me:set_yaw(getYaw(dir))
         if self.in_water then
-          self.dir.y = me:getvelocity().y
+          self.dir.y = me:get_velocity().y
         end
         update_velocity(me, self.dir, modes[current_mode].moving_speed or 0)
       end
@@ -548,8 +548,8 @@ creatures.on_step = function(self, dtime)
 
     local moving_speed = modes[current_mode].moving_speed or 0
     if moving_speed > 0 then
-      local yaw = (getYaw(me:getyaw()) + 90.0) * DEGTORAD
-      me:setyaw(yaw + 4.73)
+      local yaw = (getYaw(me:get_yaw()) + 90.0) * DEGTORAD
+      me:set_yaw(yaw + 4.73)
       self.dir = {x = math.cos(yaw), y = 0, z = math.sin(yaw)}
       if self.can_fly then
         if current_pos.y >= (modes["fly"].max_height or 50) and not self.target then
@@ -582,10 +582,10 @@ creatures.on_step = function(self, dtime)
     self.yawtimer = 0
     local mod = nil
     if current_mode == "_run" then
-      mod = me:getyaw()
+      mod = me:get_yaw()
     end
     local yaw = (getYaw(mod) + 90.0) * DEGTORAD
-    me:setyaw(yaw + 4.73)
+    me:set_yaw(yaw + 4.73)
     local moving_speed = modes[current_mode].moving_speed or 0
     if moving_speed > 0 then
       self.dir = {x = math.cos(yaw), y = nil, z = math.sin(yaw)}
@@ -600,9 +600,9 @@ creatures.on_step = function(self, dtime)
     if name then
       if name == "default:water_source" then
         self.air_cnt = 0
-        local vel = me:getvelocity()
+        local vel = me:get_velocity()
         update_velocity(me, {x = vel.x, y = 0.9, z = vel.z}, 1)
-        me:setacceleration({x = 0, y = -1.2, z = 0})
+        me:set_acceleration({x = 0, y = -1.2, z = 0})
         self.in_water = true
         -- play swimming sounds
         if def.sounds and def.sounds.swim then
@@ -615,7 +615,7 @@ creatures.on_step = function(self, dtime)
         if self.in_water == true and self.air_cnt > 5 then
           self.in_water = false
           if not self.can_fly then
-            me:setacceleration({x = 0, y = -15, z = 0})
+            me:set_acceleration({x = 0, y = -15, z = 0})
           end
         end
       end
