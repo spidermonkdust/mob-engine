@@ -65,7 +65,7 @@ function creatures.findTarget(search_obj, pos, radius, search_type, ignore_mob, 
 	local mobs = {}
 	for  _,obj in ipairs(core.get_objects_inside_radius(pos, radius)) do
     if obj ~= search_obj then
-      if xray or core.line_of_sight(pos, obj:getpos()) == true then
+      if xray or core.line_of_sight(pos, obj:get_pos()) == true then
 				local is_player = obj:is_player()
 				if is_player then
 					player_near = true

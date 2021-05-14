@@ -50,10 +50,10 @@ end
 
 local function on_hit(me)
   core.after(0.1, function()
-    me:settexturemod("^[colorize:#c4000099")
+    me:set_texture_mod("^[colorize:#c4000099")
   end)
   core.after(0.5, function()
-		me:settexturemod("")
+		me:set_texture_mod("")
 	end)
 end
 

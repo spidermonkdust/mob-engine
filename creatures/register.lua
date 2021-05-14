@@ -464,7 +464,7 @@ local function makeSpawnerEntiy(mob_name, model)
        self.timer = self.timer + dtime
        if self.timer > 30 then
          self.timer = 0
-         local n = core.get_node_or_nil(self.object:getpos())
+         local n = core.get_node_or_nil(self.object:get_pos())
          if n and n.name and n.name ~= mob_name .. "_spawner" then
            self.object:remove()
          end

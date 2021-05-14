@@ -48,7 +48,7 @@ end
 local function shear(self, drop_count, sound)
 	if self.has_wool == true then
 		self.has_wool = false
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		if sound then
 			core.sound_play("creatures_shears", {pos = pos, gain = 1, max_hear_distance = 10})
 		end
@@ -119,7 +119,7 @@ local def = {
 		if self.has_wool then
 			table.insert(items, {"wool:" .. self.wool_color, {min = 1, max = 2}})
 		end
-		creatures.dropItems(self.object:getpos(), items)
+		creatures.dropItems(self.object:get_pos(), items)
 	end,
 
 	spawning = {

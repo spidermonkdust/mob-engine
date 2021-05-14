@@ -24,7 +24,7 @@
 -- Egg
 dofile(core.get_modpath("chicken") .. "/egg.lua")
 local function dropEgg(obj)
-  local pos = obj:getpos()
+  local pos = obj:get_pos()
   if pos then
     creatures.dropItems(pos, {{"creatures:egg"}})
   end
